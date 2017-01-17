@@ -5,3 +5,6 @@
 /iftopbeat
 /iftopbeat.test
 *.pyc
+
+# IDE
+.vscode
