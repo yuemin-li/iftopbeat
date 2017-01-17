@@ -11,6 +11,28 @@ Ensure that this folder is at the following location:
 
 * [Golang](https://golang.org/dl/) 1.7
 
+### Install iftop
+On Mac
+```
+brew install iftop
+```
+iftop requires root privileges so you will need to run `sudo iftop`.
+
+### More on iftop
+iftop cmd in use
+-t          Use  text interface without ncurses and print the output to STD-OUT
+-s num      print one single text output afer num seconds, then quit
+-L num      number of lines to print
+
+`sudo iftop -t -s 5 -L 10`
+Wait for 5 sec and print 10 lines iftop result to STD-OUT
+
+`Looks like iftoprc doesn't work for -t mode?`
+
+By default iftop requires root privileges(which make sense, since you don't want any user application can sniff on your traffic).
+So if you don't wanna add iftop to userGroup, start iftopbeat with sudo, and provide your root credential. 
+
+
 ### Init Project
 To get running with Iftopbeat and also install the
 dependencies, run the following command:
