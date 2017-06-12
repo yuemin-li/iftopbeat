@@ -59,7 +59,7 @@ func (bt *Iftopbeat) getEvents() ([]IftopEvent, error) {
 	}
 	log.Printf("iftop is available at %s\n", iftop)
 	interval := 10
-	listenOn := "en0"
+	listenOn := "enp0s3"
 	numLines := 10
 	args := []string{"-t", "-s", strconv.Itoa(interval), "-L", strconv.Itoa(numLines), "-i", listenOn, "-n"}
 	cmd := exec.Command(iftop, args...)
@@ -85,8 +85,16 @@ func (bt *Iftopbeat) getEvents() ([]IftopEvent, error) {
 		} else if len(l) != 0 && strings.Contains(l, "<=") {
 			ret[len(ret)-1].Dest = l
 		}
+		// logp.Info(
+		// 	fmt.Sprintf(
+		// 		"iftop event. source: %s; destination: %s.",
+		// 		ret[len(ret)-1].Src,
+		// 		ret[len(ret)-1].Dest
+		// 	)
+		// )
 	}
-	log.Print(ret)
+
+	//log.Print(ret)
 
 	events := []IftopEvent{}
 
@@ -102,7 +110,8 @@ func (bt *Iftopbeat) getEvents() ([]IftopEvent, error) {
 		event.Download = downRecord[3]
 
 		output, _ := json.Marshal(event)
-		log.Print(string(output))
+		//log.Print(string(output))
+		logp.Info(string(output))
 		events = append(events, event)
 	}
 	return events, nil

@@ -18,24 +18,40 @@ brew install iftop
 ```
 iftop requires root privileges so you will need to run `sudo iftop`.
 
+On Ubuntu 16.04
+```
+sudo apt install iftop
+```
+This will install iftop, version 1.0pre4 on your system.
+You will need iftop version 1.0pre4 to have the `-t` option, the iftop 1.0pre2 packaged with Ubuntu 14.04 won't have this option.
+
+There is a `.Vagrantfile` included, which I use for my local development env.
+
 ### More on iftop
+Read more on its man page: https://linux.die.net/man/8/iftop
+
 iftop cmd in use
+
 -t          Use  text interface without ncurses and print the output to STD-OUT
+
 -s num      print one single text output afer num seconds, then quit
+
 -L num      number of lines to print
 
-`sudo iftop -t -s 5 -L 10`
-Wait for 5 sec and print 10 lines iftop result to STD-OUT
+-n          don't do hostname lookups
 
-`Looks like iftoprc doesn't work for -t mode?`
+
+`sudo iftop -t -s 10 -L 10 -i eth0 -n`
+
+Wait for 10 sec and print 10 lines iftop result on interface eth0 to STD-OUT
+
 
 By default iftop requires root privileges(which make sense, since you don't want any user application can sniff on your traffic).
-So if you don't wanna add iftop to userGroup, start iftopbeat with sudo, and provide your root credential. 
+So if you don't wanna start iftopbeat with sudo, add iftop to userGroup. Otherwise you will have to start iftopbeat with sudo, and provide your root credential. 
 
 
 ### Init Project
-To get running with Iftopbeat and also install the
-dependencies, run the following command:
+To get running with Iftopbeat and also install the dependencies, run the following command:
 
 ```
 make setup
@@ -61,15 +77,45 @@ in the same directory with the name iftopbeat.
 make
 ```
 
+After dev work, use `go clean` to clean up your local binary.
+
 
 ### Run
+To run elasticsearch docker locally for dev, run:
+```
+docker run --name elasticsearch -p 9200:9200 -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch:5.4.0
+```
+
+To run kibana docker locally for dev, run:
+```
+docker run --name kibana --link elasticsearch:elasticsearch -p 5601:5601 -d docker.elastic.co/kibana/kibana:5.4.0
+```
+
+By default, use `elastic/changeme` for login credentials.
 
 To run Iftopbeat with debugging output enabled, run:
 
 ```
-./iftopbeat -c iftopbeat.yml -e -d "*"
+sudo ./iftopbeat -c iftopbeat.yml -e -d "*"
 ```
 
+Get iftopbead index.
+```
+curl -u elastic:changeme http://localhost:9200/_cat/indices?v
+```
+
+The index is in iftopbeat-DATE format. 
+
+Get records of iftopbeat.
+```
+curl -u elastic:changeme http://localhost:9200/iftopbeat-<DATE>/_search?pretty=true&q=*:*
+```
+
+Get Kibana GUI.
+
+Visit your kinana at http://HOSTNAME:5601.
+
+Create a index pattern like `iftopbeat-*`, that matches multiple iftopbeat indices with different date.
 
 ### Test
 
