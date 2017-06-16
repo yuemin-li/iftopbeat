@@ -3,8 +3,14 @@
 ############################# Iftopbeat ######################################
 
 iftopbeat:
-  # Defines how often an event is sent to the output
-  period: 1s
+  # Defines how often an event is sent to the output (in seconds)
+  period: 20
+  # Defines how often the iftop gathers results
+  interval: 10
+  # Defines which interface iftop is monitoring
+  listenOn: "enp0s3"
+  # Defines the limitation of lines iftop outputs each time
+  numLines: 10
 
 #================================ General =====================================
 

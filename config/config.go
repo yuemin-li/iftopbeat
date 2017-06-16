@@ -6,9 +6,15 @@ package config
 import "time"
 
 type Config struct {
-	Period time.Duration `config:"period"`
+	Period   time.Duration `config:"period"`
+	Interval int           `config:"interval"`
+	ListenOn string        `config:"listenOn"`
+	NumLines int           `config:"numLines"`
 }
 
 var DefaultConfig = Config{
-	Period: 1 * time.Second,
+	Period:   10 * time.Second,
+	Interval: 10,
+	ListenOn: "eth0",
+	NumLines: 10,
 }

@@ -79,6 +79,23 @@ make
 
 After dev work, use `go clean` to clean up your local binary.
 
+### Configure iftopbeat
+In your iftopbeat.yml file, config the following options.
+```
+iftopbeat:
+  # Defines how often an event is sent to the output (in seconds)
+  period: 10
+  # Defines how often the iftop gathers results
+  interval: 10
+  # Defines which interface iftop is monitoring
+  listenOn: "eth0"
+  # Defines the limitation of lines iftop outputs each time
+  numLines: 10
+```
+If there is anything wrong parsing config from this file, a default config will be used for your beater process.
+
+####TODO: cmd line args support.####
+
 
 ### Run
 To run elasticsearch docker locally for dev, run:
