@@ -38,29 +38,39 @@ type Pair struct {
 	Dest string `json:"destination"`
 }
 
-// Creates beater
+// New beater creation function
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	config := config.DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+	localConfig := config.Config{}
+	if err := cfg.Unpack(&localConfig); err != nil {
+		fmt.Errorf("Error reading config file: %v, using DefaultConfig instead", err)
+		localConfig = config.DefaultConfig
 	}
 
 	bt := &Iftopbeat{
 		done:   make(chan struct{}),
-		config: config,
+		config: localConfig,
 	}
 	return bt, nil
 }
 
 func (bt *Iftopbeat) getEvents() ([]IftopEvent, error) {
+	//TODO: LookPath happends at creating beater.
 	iftop, err := exec.LookPath("iftop")
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("iftop is available at %s\n", iftop)
-	interval := 10
-	listenOn := "enp0s3"
-	numLines := 10
+	logp.Info("iftop is available at %s\n", iftop)
+
+	logp.Info(fmt.Sprintf(
+		"iftopbeat configs: period: %v; interval: %d; listenOn: %s; numLines: %d",
+		bt.config.Period,
+		bt.config.Interval,
+		bt.config.ListenOn,
+		bt.config.NumLines,
+	))
+	interval := bt.config.Interval
+	listenOn := bt.config.ListenOn
+	numLines := bt.config.NumLines
 	args := []string{"-t", "-s", strconv.Itoa(interval), "-L", strconv.Itoa(numLines), "-i", listenOn, "-n"}
 	cmd := exec.Command(iftop, args...)
 	log.Print(cmd.Path, cmd.Args)
@@ -85,16 +95,7 @@ func (bt *Iftopbeat) getEvents() ([]IftopEvent, error) {
 		} else if len(l) != 0 && strings.Contains(l, "<=") {
 			ret[len(ret)-1].Dest = l
 		}
-		// logp.Info(
-		// 	fmt.Sprintf(
-		// 		"iftop event. source: %s; destination: %s.",
-		// 		ret[len(ret)-1].Src,
-		// 		ret[len(ret)-1].Dest
-		// 	)
-		// )
 	}
-
-	//log.Print(ret)
 
 	events := []IftopEvent{}
 
